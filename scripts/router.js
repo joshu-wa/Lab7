@@ -5,7 +5,7 @@ export const router = {};
 /**
  * Changes the "page" (state) that your SPA app is currently set to
  */
-router.setState = function() {
+router.setState = function(header, hashurl, className) {
   /**
    * - There are three states that your SPA app will have
    *    1. The home page
@@ -35,4 +35,50 @@ router.setState = function() {
    *    1. You may add as many helper functions in this file as you like
    *    2. You may modify the parameters of setState() as much as you like
    */
+  let state = {'header': header, 'hashurl': hashurl, 'className': className};
+  let url = hashurl;
+  history.pushState(state, '', url);
+
+  document.body.className = className;
+  document.querySelector('header h1').innerText = header;
+}
+
+window.addEventListener('popstate', (event) => {
+  if (event.state) {
+    document.body.className = event.state['className'];
+    document.querySelector('header h1').innerText = event.state['header'];
+  }
+  else {
+    document.body.className = "";
+    document.querySelector('header h1').innerText = "Journal Entries";
+  }
+});
+
+// Fires whenever a journal entry is clicked
+const entries = document.querySelectorAll('journal-entry');
+document.addEventListener('click', function(event) {
+  let name = event.target.nodeName.toLowerCase();
+  if (name == "journal-entry") {                                            // journal entry clicked (go to single entry view)
+    let prevEntry = document.querySelector('entry-page');
+    let newEntry = document.createElement('entry-page');
+    newEntry.entry = event.target.entry;
+    document.body.appendChild(newEntry);
+    prevEntry.remove();
+    let entryNum = getNodeIndex(event.target) + 1;
+    router.setState("Entry "+entryNum, "/#entry"+entryNum, "single-entry");
+  }
+  else if (event.target.isSameNode(document.querySelector('header img'))) { // settings button clicked (go to settings)
+    router.setState("Settings", "/#settings", "settings");
+  }
+  else if (event.target.isSameNode(document.querySelector('header h1'))) {  // title header clicked (return to main page)
+    router.setState("Journal Entries", " ", "");
+  }
+});
+
+var getNodeIndex = function(node) {
+  let i = 0;
+  while((node = node.previousSibling) != null) {
+    i++;
+  }
+  return i;
 }
