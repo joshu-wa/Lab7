@@ -7,6 +7,8 @@
 
 const CACHE_NAME = 'journal-cache';
 var urlsToCache = [
+    './',
+    './scripts',
     'https://cse110lab6.herokuapp.com/entries'
 ];
 
